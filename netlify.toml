@@ -7,9 +7,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
 
-# Redirect rules for Next.js
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Next.js specific settings
+[functions]
+  node_bundler = "esbuild"
