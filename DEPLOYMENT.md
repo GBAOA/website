@@ -52,7 +52,7 @@ Create a `netlify.toml` file in your repository root with the configuration belo
 1. In Netlify Dashboard → **Site configuration** → **Environment variables**
 2. Add the following variable:
    - **Key**: `AUTH_SECRET`
-   - **Value**: `fcbf4038a82d63185387635689100803` (or generate a new one)
+   - **Value**: `` (or generate a new one)
 
 ## Step 6: Deploy
 
