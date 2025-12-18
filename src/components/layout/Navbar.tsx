@@ -51,8 +51,9 @@ export function Navbar() {
                         </Link>
                     ))}
                 </div>
+
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                    <Link href="/admin" className="text-sm font-semibold leading-6 text-primary">
+                    <Link href="/admin/login" className="text-sm font-semibold leading-6 text-primary">
                         Admin Login <span aria-hidden="true">&rarr;</span>
                     </Link>
                 </div>
@@ -71,8 +72,9 @@ export function Navbar() {
                                 {item.name}
                             </Link>
                         ))}
+
                         <Link
-                            href="/admin"
+                            href="/admin/login"
                             className="block rounded-md px-3 py-2 text-base font-medium text-primary hover:bg-accent hover:text-accent-foreground"
                             onClick={() => setMobileMenuOpen(false)}
                         >

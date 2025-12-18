@@ -1,77 +1,51 @@
-"use client"
 
-import { signIn } from "next-auth/react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { ShieldCheck } from "lucide-react"
+'use client';
 
-export default function LoginPage() {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    const [error, setError] = useState("")
-    const router = useRouter()
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        const res = await signIn("credentials", {
-            username,
-            password,
-            redirect: false,
-        })
+export default function AdminLoginPage() {
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
-        if (res?.error) {
-            setError("Invalid credentials")
-        } else {
-            router.push("/admin")
-            router.refresh()
-        }
-    }
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        // For this demo, we are just redirecting to dashboard.
+        // In a real app, we would validate a local admin password here.
+        setTimeout(() => {
+            router.push('/admin/dashboard');
+        }, 1000);
+    };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-muted/30">
-            <div className="w-full max-w-sm p-8 bg-card rounded-xl shadow-lg border">
-                <div className="flex flex-col items-center mb-6 text-center">
-                    <div className="bg-primary/10 p-3 rounded-full mb-4">
-                        <ShieldCheck className="w-8 h-8 text-primary" />
-                    </div>
-                    <h1 className="text-2xl font-bold">Admin Login</h1>
-                    <p className="text-sm text-muted-foreground">Access the secure dashboard</p>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8">
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                        Admin Portal
+                    </h2>
+                    <p className="mt-2 text-center text-sm text-gray-600">
+                        Golden Blossom Apartments
+                    </p>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Username</label>
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            required
-                        />
+                <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+                    <div className="rounded-md shadow-sm -space-y-px">
+                        {/* Placeholder for local auth checks */}
                     </div>
 
-                    {error && <p className="text-sm text-destructive font-medium">{error}</p>}
-
-                    <Button type="submit" className="w-full">
-                        Sign In
-                    </Button>
-
-                    <div className="text-center text-xs text-muted-foreground mt-4">
-                        <p>Demo: admin / admin</p>
+                    <div>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                        >
+                            {isLoading ? 'Accessing...' : 'Enter Admin Dashboard'}
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
-    )
+    );
 }
