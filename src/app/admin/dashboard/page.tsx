@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Resident {
     id: string;
@@ -19,6 +20,7 @@ interface Flat {
 }
 
 export default function AdminDashboardPage() {
+    const router = useRouter();
     const [syncing, setSyncing] = useState(false);
     const [lastSynced, setLastSynced] = useState<string | null>(null);
     const [residents, setResidents] = useState<Resident[]>([]);
@@ -57,6 +59,12 @@ export default function AdminDashboardPage() {
                                 Last Synced: {new Date(lastSynced).toLocaleString()}
                             </span>
                         )}
+                        <button
+                            onClick={() => router.push('/adda-login')}
+                            className="px-4 py-2 rounded-md text-white font-medium bg-green-600 hover:bg-green-700"
+                        >
+                            Adda.io Login
+                        </button>
                         <button
                             onClick={startSync}
                             disabled={syncing}

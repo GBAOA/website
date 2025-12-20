@@ -96,6 +96,15 @@ export async function getAddaSession(forceRefresh = false): Promise<AddaSession>
         // We'll trust that typical selectors work or search by type.
 
         console.log('[AddaAuth] Inputting credentials...');
+
+        // DEBUG: Check environment variables
+        console.log('[AddaAuth] Debug Env Vars:', {
+            ADDA_EMAIL_EXISTS: !!process.env.ADDA_EMAIL,
+            ADDA_PASSWORD_EXISTS: !!process.env.ADDA_PASSWORD,
+            EMAIL_LENGTH: process.env.ADDA_EMAIL ? process.env.ADDA_EMAIL.length : 0,
+            NODE_ENV: process.env.NODE_ENV
+        });
+
         if (!process.env.ADDA_EMAIL || !process.env.ADDA_PASSWORD) {
             throw new Error('ADDA_EMAIL or ADDA_PASSWORD not set in environment.');
         }
