@@ -1,5 +1,6 @@
 import { InteractiveLoginSession } from './adda-interactive-login';
-import { supabaseAdmin, AddaSessionRow } from './supabase';
+import { AddaSessionRow } from './supabase';
+import { supabaseAdmin } from './supabase-admin';
 
 const SESSION_EXPIRY_MS = 1000 * 60 * 60; // 1 hour
 

@@ -15,7 +15,8 @@ import { resolve } from 'path';
 // Load environment variables
 config({ path: resolve(process.cwd(), '.env.local') });
 
-import { supabase, supabaseAdmin } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
+import { supabaseAdmin } from '../lib/supabase-admin';
 
 async function validateDatabaseConnection() {
     console.log('🔍 Starting database connection validation...\n');

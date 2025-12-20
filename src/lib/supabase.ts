@@ -1,21 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Client-side Supabase client (uses anon key)
+/**
+ * Client-side Supabase Client
+ * 
+ * This is safe to use in both client and server components.
+ * It uses the public ANON_KEY which has limited permissions based on
+ * Row Level Security (RLS) policies.
+ * 
+ * For server-side operations requiring elevated permissions,
+ * use supabaseAdmin from './supabase-admin' instead.
+ */
+
+// Client-side Supabase client (uses anon key - limited by RLS)
 export const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-// Server-side Supabase client (uses service role key - more permissions)
-export const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    }
 );
 
 // Database types (you can generate these later with Supabase CLI)

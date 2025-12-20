@@ -1,4 +1,5 @@
-import { supabaseAdmin, ResidentRow, FlatRow } from './supabase';
+import { ResidentRow, FlatRow } from './supabase';
+import { supabaseAdmin } from './supabase-admin';
 import { AddaResident, AddaFlat } from './adda-client';
 
 /**
