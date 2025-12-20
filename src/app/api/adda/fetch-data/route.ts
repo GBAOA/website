@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getLatestSession } from '@/lib/adda-session-store';
+import { getLatestSession } from '@/lib/adda-session-store-db';
 import { performAddaLoginWithCapture } from '@/lib/adda-auth-enhanced';
+import type { InteractiveLoginSession } from '@/lib/adda-interactive-login';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
         console.log('[API] Fetching data from Adda endpoints:', endpoints);
 
         // Try to get stored interactive session first, fallback to automated login
-        let session = getLatestSession();
+        let session: InteractiveLoginSession | null = await getLatestSession();
         
         if (!session || session.status !== 'logged_in' || !session.cookies || session.cookies.length === 0) {
             console.log('[API] No stored session found, using automated login');

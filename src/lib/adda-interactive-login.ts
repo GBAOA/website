@@ -1,5 +1,5 @@
 import puppeteer, { Browser, Page, HTTPRequest, HTTPResponse } from 'puppeteer';
-import { storeSession } from './adda-session-store';
+import { storeSession } from './adda-session-store-db';
 
 export interface InteractiveLoginSession {
     sessionId: string;
@@ -52,9 +52,9 @@ const SESSION_TIMEOUT_MS = 1000 * 60 * 10; // 10 minutes
 
 export async function startInteractiveLogin(): Promise<{ sessionId: string; browserWSEndpoint: string }> {
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    
+
     console.log(`[InteractiveLogin] Starting session ${sessionId}`);
-    
+
     const browser = await puppeteer.launch({
         headless: false, // Show browser window
         args: [
@@ -138,7 +138,7 @@ export async function startInteractiveLogin(): Promise<{ sessionId: string; brow
                 if (contentType.includes('application/json') || contentType.includes('text/')) {
                     try {
                         body = await response.text();
-                    } catch (e) {}
+                    } catch (e) { }
                 }
 
                 networkRequests[reqIndex].response = {
@@ -156,14 +156,14 @@ export async function startInteractiveLogin(): Promise<{ sessionId: string; brow
                         tokens['bearer-token'] = headers['authorization'].substring(7);
                     }
                 }
-                
+
                 // Extract tokens from response body
                 if (body) {
                     try {
                         const data = JSON.parse(body);
                         Object.keys(data).forEach(key => {
                             const lowerKey = key.toLowerCase();
-                            if (lowerKey.includes('token') || lowerKey.includes('csrf') || 
+                            if (lowerKey.includes('token') || lowerKey.includes('csrf') ||
                                 lowerKey.includes('access') || lowerKey.includes('refresh') ||
                                 lowerKey.includes('auth')) {
                                 tokens[key] = String(data[key]);
@@ -183,7 +183,7 @@ export async function startInteractiveLogin(): Promise<{ sessionId: string; brow
                         }
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
     });
 
@@ -235,7 +235,7 @@ export async function startInteractiveLogin(): Promise<{ sessionId: string; brow
 
 export async function checkLoginStatus(sessionId: string): Promise<InteractiveLoginSession> {
     const session = activeSessions.get(sessionId);
-    
+
     if (!session) {
         return {
             sessionId,
@@ -262,7 +262,7 @@ export async function checkLoginStatus(sessionId: string): Promise<InteractiveLo
         let currentUrl: string;
         let hasPasswordField: boolean = false;
         let cookies: any[] = [];
-        
+
         try {
             currentUrl = page.url();
             hasPasswordField = !!(await page.$('input[type="password"]').catch(() => null));
@@ -275,28 +275,28 @@ export async function checkLoginStatus(sessionId: string): Promise<InteractiveLo
                 status: 'waiting'
             };
         }
-        
+
         const phpsessid = cookies.find(c => c.name === 'PHPSESSID');
         const isOnLoginPage = currentUrl.includes('/login') || currentUrl.includes('/login_auth');
-        
+
         console.log(`[InteractiveLogin] Session ${sessionId} check: URL=${currentUrl}, hasPassword=${hasPasswordField}, hasPHPSESSID=${!!phpsessid}, isOnLoginPage=${isOnLoginPage}`);
 
         // More strict login detection: 
-        // 1. Must have PHPSESSID or session cookie
+        // 1. Must have PHPSESSID or bearer token
         // 2. Must NOT be on login page
         // 3. Must NOT have password field visible
         // 4. Wait a bit after navigation to ensure login is complete
-        const hasValidSession = phpsessid || sessionCookie || bearerTokenFromStorage;
+        const hasValidSession = phpsessid || tokens['bearer-token'];
         if (hasValidSession && !isOnLoginPage && !hasPasswordField) {
             // Double-check: wait a moment and verify again to avoid false positives
             await new Promise(r => setTimeout(r, 2000));
-            
+
             try {
                 const verifyUrl = page.url();
                 const verifyPassword = !!(await page.$('input[type="password"]').catch(() => null));
                 const verifyCookies = await page.cookies();
                 const verifyPhpsessid = verifyCookies.find(c => c.name === 'PHPSESSID');
-                
+
                 if (verifyPhpsessid && !verifyUrl.includes('/login') && !verifyPassword) {
                     console.log(`[InteractiveLogin] Session ${sessionId} - Login confirmed!`);
 
@@ -332,13 +332,13 @@ export async function checkLoginStatus(sessionId: string): Promise<InteractiveLo
 
                     // IMPORTANT: Store session BEFORE browser might close
                     // This ensures session persists even if user closes browser
-                    storeSession(sessionId, result);
+                    await storeSession(sessionId, result);
                     console.log(`[InteractiveLogin] Session ${sessionId} stored successfully with ${verifyCookies.length} cookies and ${Object.keys(tokens).length} tokens`);
 
                     // DON'T close browser immediately - let user see the result
                     // Browser will be closed when session times out or user cancels
                     // activeSessions.delete(sessionId); // Keep session active for a bit
-                    
+
                     // Set a delayed cleanup (5 minutes) to close browser
                     // But session data is already saved, so closing browser won't lose data
                     setTimeout(async () => {
@@ -346,7 +346,7 @@ export async function checkLoginStatus(sessionId: string): Promise<InteractiveLo
                             const delayedSession = activeSessions.get(sessionId);
                             if (delayedSession) {
                                 console.log(`[InteractiveLogin] Closing browser for session ${sessionId} after delay`);
-                                await delayedSession.browser.close().catch(() => {});
+                                await delayedSession.browser.close().catch(() => { });
                                 activeSessions.delete(sessionId);
                             }
                         }
@@ -397,12 +397,12 @@ export async function cancelSession(sessionId: string): Promise<void> {
         try {
             const currentUrl = session.page.url();
             const cookies = await session.page.cookies();
-            const hasSession = cookies.find(c => 
-                c.name === 'PHPSESSID' || 
+            const hasSession = cookies.find(c =>
+                c.name === 'PHPSESSID' ||
                 c.name.toLowerCase().includes('session') ||
                 c.name.toLowerCase().includes('auth')
             );
-            
+
             // If we have a session but haven't stored it yet, try to store it now
             if (hasSession && !currentUrl.includes('/login')) {
                 console.log(`[InteractiveLogin] Saving session data before closing browser for session ${sessionId}`);
@@ -425,13 +425,13 @@ export async function cancelSession(sessionId: string): Promise<void> {
                     },
                     tokens: { ...session.tokens }
                 };
-                storeSession(sessionId, result);
+                await storeSession(sessionId, result);
             }
         } catch (e) {
             console.warn(`[InteractiveLogin] Could not save session before closing:`, e);
         }
-        
-        await session.browser.close().catch(() => {});
+
+        await session.browser.close().catch(() => { });
         activeSessions.delete(sessionId);
     }
 }
