@@ -88,15 +88,19 @@ async function validateDatabaseConnection() {
 
         // Test 4: List existing tables
         console.log('\n4️⃣ Checking database schema...');
-        const { data: tables, error: tablesError } = await supabaseAdmin
-            .rpc('get_tables')
-            .catch(async () => {
-                // Fallback: try to query information_schema directly
-                return await supabaseAdmin
-                    .from('information_schema.tables')
-                    .select('table_name')
-                    .eq('table_schema', 'public');
-            });
+
+        // Try to call get_tables RPC if it exists, otherwise skip
+        let tables: any = null;
+        let tablesError: any = null;
+
+        try {
+            const result = await supabaseAdmin.rpc('get_tables');
+            tables = result.data;
+            tablesError = result.error;
+        } catch (rpcError: any) {
+            // RPC function might not exist, which is fine
+            console.log('   ℹ️  get_tables RPC function not available');
+        }
 
         if (tablesError) {
             console.warn('   ⚠️  Could not list tables (this might be a permissions issue)');
@@ -112,7 +116,7 @@ async function validateDatabaseConnection() {
                 }
             }
         } else {
-            console.log('   ℹ️  No tables found in public schema (database might be empty)');
+            console.log('   ℹ️  No tables found or table listing not available');
         }
 
         // Test 5: Check specific important tables for your app
