@@ -11,7 +11,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 
 # Supabase Anonymous Key (public-facing, limited by RLS)
 # ⚠️ This is SAFE to expose - it's designed to be public
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
 ### Private Variables (Server-side only, NEVER expose)
