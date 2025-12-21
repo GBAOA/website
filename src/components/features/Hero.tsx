@@ -18,11 +18,11 @@ export function Hero() {
                         </a>
                     </div>
                     <h1 className="mt-10 text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
-                        Live Better at Golden Blossom
+                        Welcome to Golden Blossom Apartments
                     </h1>
                     <p className="mt-6 text-lg leading-8 text-muted-foreground">
-                        Experience the perfect blend of luxury, community, and nature.
-                        Golden Blossom Apartments offers a premium lifestyle with state-of-the-art amenities and a vibrant community.
+                        Your premium information hub and community portal.
+                        Experience a life of safety, community, and sustainability in the heart of the city.
                     </p>
                     <div className="mt-10 flex items-center gap-x-6">
                         <Button asChild size="lg">

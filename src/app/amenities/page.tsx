@@ -4,16 +4,15 @@ import {
 } from "lucide-react"
 
 const amenities = [
-    { name: '24/7 Security', description: 'Round-the-clock security personnel and CCTV surveillance.', icon: ShieldCheck },
-    { name: 'Power Backup', description: '100% power backup for common areas and essential services.', icon: Zap },
-    { name: 'Dedicated Parking', description: 'Spacious covered parking for residents and visitors.', icon: Car },
-    { name: 'Lift Access', description: 'High-speed elevators with power backup.', icon: Accessibility },
-    { name: 'Green Gardens', description: 'Beautifully landscaped gardens and green zones.', icon: TreePine },
-    { name: 'Modern Gym', description: 'Fully equipped fitness center for your daily workout.', icon: Dumbbell },
-    { name: 'Walking Track', description: 'Jogging and walking tracks amidst greenery.', icon: Footprints },
-    { name: 'Clubhouse', description: 'Community hall for events and gatherings.', icon: Users },
-    { name: 'Children\'s Play Area', description: 'Safe and fun play zones for kids.', icon: Sprout },
-    { name: 'Waste Management', description: 'Efficient waste segregation and water treatment plants.', icon: Recycle },
+    { name: '24/7 Security', description: 'Round-the-clock security personnel and MyGate visitor management.', icon: ShieldCheck },
+    { name: 'Power Backup', description: 'Safe and reliable 100% power backup for common areas and elevators.', icon: Zap },
+    { name: 'Ample Parking', description: 'Dedicated and spacious parking spaces for residents and visitors.', icon: Car },
+    { name: 'Lift Access', description: 'High-speed automated elevators for easy access to all floors.', icon: Accessibility },
+    { name: 'Fully Equipped Gym', description: 'Modern fitness center with a range of strength and cardio equipment.', icon: Dumbbell },
+    { name: 'Children’s Play Area', description: 'Dedicated safe zones for kids to play and interact.', icon: Sprout },
+    { name: 'Walking Track', description: 'Paved tracks within the community for morning and evening walks.', icon: Footprints },
+    { name: 'Community Hall', description: 'Spacious clubhouse for gatherings, meetings, and celebrations.', icon: Users },
+    { name: 'Green Spaces', description: 'Wide open green zones and manicured gardens for relaxation.', icon: TreePine },
 ]
 
 export default function Amenities() {

@@ -21,20 +21,20 @@ export default function Contact() {
                                 <MapPin className="w-6 h-6 text-primary mt-1" />
                                 <div>
                                     <p className="font-medium">Golden Blossom Apartments</p>
-                                    <p className="text-muted-foreground text-sm">123 Blossom Lane, Green Valley<br />City, State - 560001</p>
+                                    <p className="text-muted-foreground text-sm">Ward No. 83, Sai Baba Ashram, Whitefield - Hoskote Rd, Kadugodi<br />Bengaluru, Karnataka - 560067</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
                                 <Phone className="w-6 h-6 text-primary" />
                                 <div>
-                                    <p className="font-medium">+91 98765 43210</p>
+                                    <p className="font-medium">7899239977</p>
                                     <p className="text-muted-foreground text-sm">Security / Office</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
                                 <Mail className="w-6 h-6 text-primary" />
                                 <div>
-                                    <p className="font-medium">office@goldenblossom.com</p>
+                                    <p className="font-medium">manager@golden-blossom.com</p>
                                     <p className="text-muted-foreground text-sm">Email us anytime</p>
                                 </div>
                             </div>
