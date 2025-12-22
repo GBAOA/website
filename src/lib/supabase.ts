@@ -55,3 +55,38 @@ export interface FlatRow {
     updated_at: string;
 }
 
+export interface NoticeRow {
+    id: string;
+    title: string;
+    content: string;
+    category: 'Maintenance' | 'Events' | 'Emergency' | 'General';
+    urgent: boolean;
+    published_date: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface EventRow {
+    id: string;
+    title: string;
+    description: string | null;
+    date: string; // YYYY-MM-DD
+    time: string | null;
+    location: string | null;
+    image_url: string | null;
+    google_calendar_event_id: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface DocumentRow {
+    id: string;
+    title: string;
+    category: string;
+    google_drive_id: string | null;
+    google_drive_url: string | null;
+    description: string | null;
+    created_at: string;
+    updated_at: string;
+}
+

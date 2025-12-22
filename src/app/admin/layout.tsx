@@ -1,8 +1,7 @@
 import Link from "next/link"
 import { signOut } from "@/auth"
 import { Button } from "@/components/ui/button"
-import {
-    LayoutDashboard, Calendar, Bell, Image as ImageIcon, Users, LogOut
+LayoutDashboard, Calendar, Bell, Image as ImageIcon, Users, LogOut, FileText
 } from "lucide-react"
 
 export default function AdminLayout({
@@ -27,6 +26,9 @@ export default function AdminLayout({
                     </Link>
                     <Link href="/admin/notices" className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
                         <Bell className="w-4 h-4" /> Notices
+                    </Link>
+                    <Link href="/admin/documents" className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                        <FileText className="w-4 h-4" /> Documents
                     </Link>
                     <Link href="/admin/gallery" className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
                         <ImageIcon className="w-4 h-4" /> Gallery
