@@ -1,5 +1,4 @@
-
-import puppeteer, { Browser, Page } from 'puppeteer';
+import { Browser, Page } from 'puppeteer-core';
 
 interface AddaSession {
     cookies: any[];
@@ -9,6 +8,35 @@ interface AddaSession {
 
 let cachedSession: AddaSession | null = null;
 const SESSION_EXPIRY_MS = 1000 * 60 * 15; // 15 minutes
+
+async function getBrowser(): Promise<Browser> {
+    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.AWS_LAMBDA_FUNCTION_VERSION;
+
+    if (isProduction) {
+        console.log('[AddaAuth] Running in Production/Lambda mode');
+        const chromium = await import('@sparticuz/chromium');
+        const puppeteer = await import('puppeteer-core');
+
+        // Cast to any to avoid strict type checking on chromium imports which can vary
+        const chromiumMod = (chromium.default || chromium) as any;
+
+        return puppeteer.default.launch({
+            args: chromiumMod.args,
+            defaultViewport: chromiumMod.defaultViewport,
+            executablePath: await chromiumMod.executablePath(),
+            headless: chromiumMod.headless,
+            ignoreHTTPSErrors: true,
+        } as any) as unknown as Browser;
+    } else {
+        console.log('[AddaAuth] Running in Local mode');
+        const puppeteer = await import('puppeteer');
+        // Cast local browser to puppeteer-core Browser type
+        return puppeteer.default.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        }) as unknown as Browser;
+    }
+}
 
 export async function getAddaSession(forceRefresh = false): Promise<AddaSession> {
     if (
@@ -21,10 +49,7 @@ export async function getAddaSession(forceRefresh = false): Promise<AddaSession>
     }
 
     console.log('[AddaAuth] Starting new login flow...');
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    const browser = await getBrowser();
 
     try {
         const page = await browser.newPage();

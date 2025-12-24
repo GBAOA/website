@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { signOut } from "@/auth"
 import { Button } from "@/components/ui/button"
-LayoutDashboard, Calendar, Bell, Image as ImageIcon, Users, LogOut, FileText
+import {
+    LayoutDashboard, Calendar, Bell, Image as ImageIcon, Users, LogOut, FileText
 } from "lucide-react"
 
 export default function AdminLayout({

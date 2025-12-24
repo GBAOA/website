@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Page, HTTPRequest, HTTPResponse } from 'puppeteer';
+import { Browser, Page, HTTPRequest, HTTPResponse } from 'puppeteer-core';
 import { storeSession } from './adda-session-store-db';
 
 export interface InteractiveLoginSession {
@@ -55,16 +55,37 @@ export async function startInteractiveLogin(): Promise<{ sessionId: string; brow
 
     console.log(`[InteractiveLogin] Starting session ${sessionId}`);
 
-    const browser = await puppeteer.launch({
-        headless: false, // Show browser window
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-blink-features=AutomationControlled',
-            '--window-size=1280,800'
-        ],
-        defaultViewport: { width: 1280, height: 800 }
-    });
+    let browser: Browser;
+    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.AWS_LAMBDA_FUNCTION_VERSION || process.env.NETLIFY;
+
+    if (isProduction) {
+        console.log('[InteractiveLogin] Running in Production/Lambda mode (Headless)');
+        const chromium = await import('@sparticuz/chromium');
+        const puppeteer = await import('puppeteer-core');
+
+        const chromiumMod = (chromium.default || chromium) as any;
+
+        browser = await puppeteer.default.launch({
+            args: chromiumMod.args,
+            defaultViewport: chromiumMod.defaultViewport,
+            executablePath: await chromiumMod.executablePath(),
+            headless: chromiumMod.headless,
+            ignoreHTTPSErrors: true,
+        } as any) as unknown as Browser;
+    } else {
+        console.log('[InteractiveLogin] Running in Local mode (Interactive)');
+        const puppeteer = await import('puppeteer');
+        browser = await puppeteer.default.launch({
+            headless: false, // Show browser window locally
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-blink-features=AutomationControlled',
+                '--window-size=1280,800'
+            ],
+            defaultViewport: { width: 1280, height: 800 }
+        }) as unknown as Browser;
+    }
 
     const page = await browser.newPage();
     await page.setUserAgent(

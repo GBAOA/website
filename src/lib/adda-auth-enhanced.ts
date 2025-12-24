@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Page, HTTPRequest, HTTPResponse } from 'puppeteer';
+import { Browser, Page, HTTPRequest, HTTPResponse } from 'puppeteer-core';
 
 export interface NetworkRequest {
     url: string;
@@ -31,6 +31,35 @@ export interface CapturedSession {
 let capturedSession: CapturedSession | null = null;
 const SESSION_EXPIRY_MS = 1000 * 60 * 15; // 15 minutes
 
+async function getBrowser(): Promise<Browser> {
+    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.AWS_LAMBDA_FUNCTION_VERSION;
+
+    if (isProduction) {
+        console.log('[AddaAuth] Running in Production/Lambda mode');
+        const chromium = await import('@sparticuz/chromium');
+        const puppeteer = await import('puppeteer-core');
+
+        // Cast to any to avoid strict type checking on chromium imports which can vary
+        const chromiumMod = (chromium.default || chromium) as any;
+
+        return puppeteer.default.launch({
+            args: chromiumMod.args,
+            defaultViewport: chromiumMod.defaultViewport,
+            executablePath: await chromiumMod.executablePath(),
+            headless: chromiumMod.headless,
+            ignoreHTTPSErrors: true,
+        } as any) as unknown as Browser;
+    } else {
+        console.log('[AddaAuth] Running in Local mode');
+        const puppeteer = await import('puppeteer');
+        // Cast local browser to puppeteer-core Browser type
+        return puppeteer.default.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        }) as unknown as Browser;
+    }
+}
+
 export async function performAddaLoginWithCapture(forceRefresh = false): Promise<CapturedSession> {
     if (
         !forceRefresh &&
@@ -42,10 +71,7 @@ export async function performAddaLoginWithCapture(forceRefresh = false): Promise
     }
 
     console.log('[AddaAuth] Starting login flow with network capture...');
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    const browser = await getBrowser();
 
     const networkRequests: NetworkRequest[] = [];
     const capturedEndpoints = {
@@ -159,8 +185,8 @@ export async function performAddaLoginWithCapture(forceRefresh = false): Promise
                         tokens['csrf-token'] = headers['x-csrf-token'];
                     }
                     if (headers['set-cookie']) {
-                        const cookies = Array.isArray(headers['set-cookie']) 
-                            ? headers['set-cookie'] 
+                        const cookies = Array.isArray(headers['set-cookie'])
+                            ? headers['set-cookie']
                             : [headers['set-cookie']];
                         cookies.forEach(cookie => {
                             if (cookie.includes('token=') || cookie.includes('csrf=')) {
